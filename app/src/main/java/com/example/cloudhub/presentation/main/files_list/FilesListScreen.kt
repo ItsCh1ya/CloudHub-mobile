@@ -1,5 +1,6 @@
 package com.example.cloudhub.presentation.main.files_list
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -39,7 +40,7 @@ fun FilesListScreen(
                 Icon(imageVector = Icons.Filled.Add, contentDescription = "Upload")
             }
         },
-        content = {paddingValues ->
+        content = { paddingValues ->
             Column(modifier = Modifier.padding(paddingValues)) {
                 if (state.success and state.files.isEmpty()) {
                     Text(
@@ -49,7 +50,7 @@ fun FilesListScreen(
                             .fillMaxWidth()
                             .padding(16.dp)
                     )
-                } else if (state.isLoading == true){
+                } else if (state.isLoading == true) {
                     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             CircularProgressIndicator()
@@ -57,7 +58,7 @@ fun FilesListScreen(
                             Text(text = "Loading, please wait...")
                         }
                     }
-                } else if ((!state.success) and (state.isLoading == false)){
+                } else if ((!state.success) and (state.isLoading == false)) {
                     Text(
                         text = "An unknown error occurred. Please try again later.",
                         textAlign = TextAlign.Center,
@@ -67,8 +68,10 @@ fun FilesListScreen(
                     )
                 } else {
                     LazyColumn {
-                        items(state.files) {filename ->
-                            Text(text = filename)
+                        items(state.files) { filename ->
+                            Text(
+                                text = filename,
+                                Modifier.clickable { viewModel.downloadFile(filename) })
                         }
                     }
                 }

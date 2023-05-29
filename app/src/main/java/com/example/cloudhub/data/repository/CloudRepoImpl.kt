@@ -7,6 +7,7 @@ import com.example.cloudhub.data.remote.dto.RegistrationResultDto
 import com.example.cloudhub.data.remote.pbo.LoginRequestBody
 import com.example.cloudhub.data.remote.pbo.RegistrationRequestBody
 import com.example.cloudhub.domain.repository.CloudRepository
+import okhttp3.ResponseBody
 import javax.inject.Inject
 
 class CloudRepoImpl @Inject constructor(
@@ -34,5 +35,9 @@ class CloudRepoImpl @Inject constructor(
 
     override suspend fun getFiles(): FilesResultDto {
         return api.getFiles()
+    }
+
+    override suspend fun downloadFile(fileId: String): ResponseBody {
+        return api.downloadFile(fileId)
     }
 }
