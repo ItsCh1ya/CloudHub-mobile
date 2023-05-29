@@ -16,6 +16,8 @@ import androidx.compose.material3.Text
 import com.example.cloudhub.common.isCookieExist
 import com.example.cloudhub.presentation.auth.login.LoginScreen
 import com.example.cloudhub.presentation.auth.register.RegScreen
+import com.example.cloudhub.presentation.main.files_list.FilesListScreen
+import com.example.cloudhub.presentation.settings.SettingsScreen
 import com.example.cloudhub.presentation.ui.theme.CloudHubTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -35,14 +37,14 @@ class MainActivity : ComponentActivity() {
                         navController = navController,
                         startDestination = if (loginedIn) "main" else "auth"
                     ) {
-                        composable("settings") { }
+                        composable("settings") { SettingsScreen(navController = navController) }
                         navigation(startDestination = "login", route = "auth") {
                             composable("login") { LoginScreen(navController = navController) }
                             composable("register") { RegScreen(navController = navController) }
                         }
                         navigation(startDestination = "files_list", route = "main") {
                             composable("files_list") {
-                                Text(text = "MAIN")
+                                FilesListScreen(navController = navController)
                             }
                         }
                     }
