@@ -17,12 +17,12 @@ class FilesListViewModel @Inject constructor(
     private val fetchFilesUseCase: FetchFilesUseCase
 ) : ViewModel() {
 
-    private val _state = mutableStateOf(FilesResult(
+    private val filesResultMutableState = mutableStateOf(FilesResult(
         files = listOf(),
         success = false,
         isLoading = true
     ))
-    val state: State<FilesResult> = _state
+    val filesResultState: State<FilesResult> = filesResultMutableState
 
     init {
         fetchFiles()
@@ -32,17 +32,17 @@ class FilesListViewModel @Inject constructor(
         fetchFilesUseCase().onEach { result ->
             when (result) {
                 is Resource.Success -> {
-                    _state.value = FilesResult(
+                    filesResultMutableState.value = FilesResult(
                         files = result.data?.files ?: listOf(),
                         success = true,
                         isLoading = false
                     )
                 }
                 is Resource.Error -> {
-                    _state.value = FilesResult(files = listOf(), success = false, isLoading = false)
+                    filesResultMutableState.value = FilesResult(files = listOf(), success = false, isLoading = false)
                 }
                 is Resource.Loading -> {
-                    _state.value = FilesResult(files = listOf(), success = false, isLoading = true)
+                    filesResultMutableState.value = FilesResult(files = listOf(), success = false, isLoading = true)
                 }
             }
         }.launchIn(viewModelScope)

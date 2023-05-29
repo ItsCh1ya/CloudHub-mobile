@@ -29,7 +29,7 @@ import com.example.cloudhub.presentation.components.TopBar
 fun FilesListScreen(
     viewModel: FilesListViewModel = hiltViewModel(), navController: NavController
 ) {
-    val state = viewModel.state.value
+    val state = viewModel.filesResultState.value
     Scaffold(
         topBar = {
             TopBar(title = "CloudHub", navController = navController)
