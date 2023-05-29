@@ -3,6 +3,8 @@ package com.example.cloudhub.domain.repository
 import com.example.cloudhub.data.remote.dto.FilesResultDto
 import com.example.cloudhub.data.remote.dto.LoginResultDto
 import com.example.cloudhub.data.remote.dto.RegistrationResultDto
+import com.example.cloudhub.data.remote.dto.UploadFileDto
+import okhttp3.MultipartBody
 import okhttp3.ResponseBody
 
 interface CloudRepository {
@@ -13,4 +15,5 @@ interface CloudRepository {
 
     suspend fun getFiles(): FilesResultDto
     suspend fun downloadFile(fileId: String): ResponseBody
+    suspend fun uploadFile(file: MultipartBody.Part): UploadFileDto
 }

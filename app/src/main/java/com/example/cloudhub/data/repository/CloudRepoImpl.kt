@@ -4,9 +4,11 @@ import com.example.cloudhub.data.remote.CloudHubApi
 import com.example.cloudhub.data.remote.dto.FilesResultDto
 import com.example.cloudhub.data.remote.dto.LoginResultDto
 import com.example.cloudhub.data.remote.dto.RegistrationResultDto
+import com.example.cloudhub.data.remote.dto.UploadFileDto
 import com.example.cloudhub.data.remote.pbo.LoginRequestBody
 import com.example.cloudhub.data.remote.pbo.RegistrationRequestBody
 import com.example.cloudhub.domain.repository.CloudRepository
+import okhttp3.MultipartBody
 import okhttp3.ResponseBody
 import javax.inject.Inject
 
@@ -39,5 +41,9 @@ class CloudRepoImpl @Inject constructor(
 
     override suspend fun downloadFile(fileId: String): ResponseBody {
         return api.downloadFile(fileId)
+    }
+
+    override suspend fun uploadFile(file: MultipartBody.Part): UploadFileDto {
+        return api.uploadFile(file)
     }
 }

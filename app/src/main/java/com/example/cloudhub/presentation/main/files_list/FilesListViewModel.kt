@@ -10,21 +10,23 @@ import com.example.cloudhub.common.Resource
 import com.example.cloudhub.domain.model.FilesResult
 import com.example.cloudhub.domain.use_cases.DownloadFileUseCase
 import com.example.cloudhub.domain.use_cases.FetchFilesUseCase
+import com.example.cloudhub.domain.use_cases.UploadFileUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import okhttp3.MultipartBody
 import okhttp3.ResponseBody
 import java.io.File
-import java.io.InputStream
 import javax.inject.Inject
 
 @HiltViewModel
 class FilesListViewModel @Inject constructor(
     private val fetchFilesUseCase: FetchFilesUseCase,
-    private val downloadFileUseCase: DownloadFileUseCase
+    private val downloadFileUseCase: DownloadFileUseCase,
+    private val uploadFileUseCase: UploadFileUseCase
 ) : ViewModel() {
 
     private val filesResultMutableState = mutableStateOf(FilesResult(
@@ -84,6 +86,11 @@ class FilesListViewModel @Inject constructor(
         } catch (e: Exception) {
             Log.e("saveFile", e.toString())
             return@withContext ""
+        }
+    }
+    fun uploadFile(file: MultipartBody.Part){
+        viewModelScope.launch {
+            uploadFileUseCase(file)
         }
     }
 }
