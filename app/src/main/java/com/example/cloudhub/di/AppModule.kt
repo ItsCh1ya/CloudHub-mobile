@@ -1,5 +1,8 @@
 package com.example.cloudhub.di
 
+import com.example.cloudhub.common.CookieInterceptor
+import android.app.Application
+import android.content.Context
 import com.example.cloudhub.data.remote.CloudHubApi
 import com.example.cloudhub.data.repository.CloudRepoImpl
 import com.example.cloudhub.domain.repository.CloudRepository
@@ -7,9 +10,6 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import okhttp3.Cookie
-import okhttp3.CookieJar
-import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -22,25 +22,21 @@ import javax.inject.Singleton
 object AppModule {
     @Provides
     @Singleton
-    fun provideCloudHubApi(): CloudHubApi {
-        val interceptor = HttpLoggingInterceptor()
-        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
+    fun provideContext(application: Application): Context {
+        return application.applicationContext
+    }
+
+    @Provides
+    @Singleton
+    fun provideCloudHubApi(context: Context): CloudHubApi {
+        val loggingInterceptor = HttpLoggingInterceptor()
+        val cookieInterceptor = CookieInterceptor(context)
+        loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
         val client: OkHttpClient =
             OkHttpClient
                 .Builder()
-                .addInterceptor(interceptor) //Logging
-                .cookieJar(object : CookieJar { //Saving cookies, TODO: Refactor to spectated file
-                    private val cookieStore: MutableMap<String, MutableList<Cookie>> = HashMap()
-
-                    override fun saveFromResponse(url: HttpUrl, cookies: List<Cookie>) {
-                        cookieStore[url.host] = cookies.toMutableList()
-                    }
-
-                    override fun loadForRequest(url: HttpUrl): List<Cookie> {
-                        val cookies = cookieStore[url.host]
-                        return cookies ?: ArrayList()
-                    }
-                })
+                .addInterceptor(loggingInterceptor) //Logging
+                .addInterceptor(cookieInterceptor)
                 .build()
 
 
