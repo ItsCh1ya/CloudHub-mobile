@@ -1,9 +1,11 @@
 package com.example.cloudhub.common
 
 import android.content.Context
+import android.content.SharedPreferences
 import okhttp3.Interceptor
 import okhttp3.Request
 import okhttp3.Response
+
 
 class CookieInterceptor(private val context: Context) : Interceptor {
 
@@ -48,4 +50,16 @@ class CookieInterceptor(private val context: Context) : Interceptor {
         editor.putString("cookie", cookie)
         editor.apply()
     }
+}
+
+fun isCookieExist(context: Context): Boolean {
+    val sharedPreferences = context.getSharedPreferences("cookies", Context.MODE_PRIVATE)
+    return sharedPreferences.getString("cookie", null) != null
+}
+
+fun delCookie(context: Context) {
+    val sharedPreferences = context.getSharedPreferences("cookies", Context.MODE_PRIVATE)
+    val editor: SharedPreferences.Editor = sharedPreferences.edit()
+    editor.remove("cookies")
+    editor.apply()
 }
