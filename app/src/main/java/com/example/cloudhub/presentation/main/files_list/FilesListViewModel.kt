@@ -11,9 +11,11 @@ import com.example.cloudhub.domain.model.FilesResult
 import com.example.cloudhub.domain.use_cases.DownloadFileUseCase
 import com.example.cloudhub.domain.use_cases.FetchFilesUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import okhttp3.ResponseBody
 import java.io.File
 import java.io.InputStream
@@ -67,22 +69,21 @@ class FilesListViewModel @Inject constructor(
         }
     }
 
-    private fun saveFile(body: ResponseBody, filename: String): String {
+    private suspend fun saveFile(body: ResponseBody, filename: String): String = withContext(
+        Dispatchers.IO) {
         val downloadsDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
         val file = File(downloadsDirectory, filename)
 
-        val input: InputStream? = null
         try {
             body.byteStream().use { inputStream ->
-                file.outputStream().use { outputStream->
+                file.outputStream().use { outputStream ->
                     inputStream.copyTo(outputStream)
                 }
             }
+            return@withContext ""
         } catch (e: Exception) {
             Log.e("saveFile", e.toString())
-        } finally {
-            input?.close()
+            return@withContext ""
         }
-        return ""
     }
 }

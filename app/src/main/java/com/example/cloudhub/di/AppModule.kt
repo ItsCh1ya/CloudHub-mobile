@@ -1,8 +1,8 @@
 package com.example.cloudhub.di
 
-import com.example.cloudhub.common.CookieInterceptor
 import android.app.Application
 import android.content.Context
+import com.example.cloudhub.common.CookieInterceptor
 import com.example.cloudhub.data.remote.CloudHubApi
 import com.example.cloudhub.data.repository.CloudRepoImpl
 import com.example.cloudhub.domain.repository.CloudRepository
@@ -11,7 +11,6 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
@@ -29,13 +28,10 @@ object AppModule {
     @Provides
     @Singleton
     fun provideCloudHubApi(context: Context): CloudHubApi {
-        val loggingInterceptor = HttpLoggingInterceptor()
         val cookieInterceptor = CookieInterceptor(context)
-        loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
         val client: OkHttpClient =
             OkHttpClient
                 .Builder()
-                .addInterceptor(loggingInterceptor) //Logging
                 .addInterceptor(cookieInterceptor)
                 .build()
 
