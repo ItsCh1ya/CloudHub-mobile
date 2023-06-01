@@ -76,7 +76,7 @@ fun RegScreen(
                 }
                 Spacer(Modifier.weight(1f))
                 Button(onClick = {
-                    viewModel.register(username.value, email.value, password.value, navController, context)
+                    viewModel.register(username.value, password.value, email.value, navController, context)
                 }) {
                     Text(text = "Register")
                 }
