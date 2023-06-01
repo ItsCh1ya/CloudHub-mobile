@@ -60,7 +60,7 @@ fun CloudHubTheme(
             val color = colorScheme.background.toArgb()
             window.statusBarColor = color
             window.navigationBarColor = color
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = darkTheme
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
         }
     }
 
