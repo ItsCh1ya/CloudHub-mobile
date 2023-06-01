@@ -1,8 +1,10 @@
 package com.example.cloudhub.presentation
 
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -12,17 +14,16 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
-import androidx.compose.material3.Text
 import com.example.cloudhub.common.isCookieExist
 import com.example.cloudhub.presentation.auth.login.LoginScreen
 import com.example.cloudhub.presentation.auth.register.RegScreen
 import com.example.cloudhub.presentation.main.files_list.FilesListScreen
-import com.example.cloudhub.presentation.settings.SettingsScreen
 import com.example.cloudhub.presentation.ui.theme.CloudHubTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -37,7 +38,6 @@ class MainActivity : ComponentActivity() {
                         navController = navController,
                         startDestination = if (loginedIn) "main" else "auth"
                     ) {
-                        composable("settings") { SettingsScreen(navController = navController) }
                         navigation(startDestination = "login", route = "auth") {
                             composable("login") { LoginScreen(navController = navController) }
                             composable("register") { RegScreen(navController = navController) }
