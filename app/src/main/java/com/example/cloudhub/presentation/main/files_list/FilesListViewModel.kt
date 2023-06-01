@@ -133,4 +133,10 @@ class FilesListViewModel @Inject constructor(
         }
         return name
     }
+
+    fun isFileDownloaded(fileName: String): Boolean {
+        val downloadsDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+        val file = File(downloadsDirectory, fileName)
+        return file.exists()
+    }
 }
