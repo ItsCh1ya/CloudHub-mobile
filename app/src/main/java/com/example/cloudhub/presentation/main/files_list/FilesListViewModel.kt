@@ -69,7 +69,7 @@ class FilesListViewModel @Inject constructor(
 
                 val response = uploadFileUseCase(body) // Use use-case instead
                 Log.d("pickerDocs", response.toString())
-                // Handle the response
+                fetchFiles()
             }
         }
     }
@@ -122,20 +122,15 @@ class FilesListViewModel @Inject constructor(
         }
     }
 
-    private fun getFileNameFromUri(contentResolver: ContentResolver, uri: Uri): String {
-        val cursor = contentResolver.query(uri, null, null, null, null)
-        cursor?.use {
-            if (it.moveToFirst()) {
-                val displayNameIndex = it.getColumnIndex(OpenableColumns.DISPLAY_NAME)
-                if (displayNameIndex != -1) {
-                    val displayName = it.getString(displayNameIndex)
-                    val extension = MimeTypeMap.getFileExtensionFromUrl(displayName)
-                    if (!extension.isNullOrEmpty()) {
-                        return "${System.currentTimeMillis()}.$extension"
-                    }
-                }
-            }
+    fun getFileNameFromUri(contentResolver: ContentResolver, uri: Uri): String {
+        var name: String = "myfile"
+        val returnCursor = contentResolver.query(uri, null, null, null, null)
+        returnCursor?.let { cursor ->
+            val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+            cursor.moveToFirst()
+            name = cursor.getString(nameIndex)
+            cursor.close()
         }
-        return ""
+        return name
     }
 }
