@@ -34,7 +34,7 @@ fun LoginScreen(
     val email = remember { mutableStateOf("") }
     val password = remember { mutableStateOf("") }
     Column {
-        TopBar("Authorization", navController)
+        TopBar("Authorization", navController, showLogout = false)
 
         Column(modifier = Modifier
             .padding(horizontal = 48.dp)

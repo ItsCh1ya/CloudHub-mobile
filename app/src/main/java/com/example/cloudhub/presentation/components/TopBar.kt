@@ -18,7 +18,7 @@ import com.example.cloudhub.common.delCookie
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopBar(title: String, navController: NavController, showLogout: Boolean = false) {
+fun TopBar(title: String, navController: NavController, showLogout: Boolean = true) {
     val context = LocalContext.current
     if (showLogout) {
         TopAppBar(

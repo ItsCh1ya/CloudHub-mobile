@@ -49,7 +49,11 @@ class RegViewModel @Inject constructor(
             when (it) {
                 is Resource.Success -> {
                     _regState.value = RegistrationResult(true, "Account successfully registered")
-                    navController.navigate("main")
+                    navController.navigate("main") {
+                        popUpTo("auth") {
+                            inclusive = true
+                        }
+                    }
                 }
 
                 is Resource.Error -> {

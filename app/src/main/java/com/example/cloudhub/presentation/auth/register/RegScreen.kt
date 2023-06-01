@@ -35,7 +35,7 @@ fun RegScreen(
     val username = remember { mutableStateOf("") }
 
     Column {
-        TopBar("Authorization", navController)
+        TopBar("Authorization", navController, showLogout = false)
         Column(modifier = Modifier
             .padding(horizontal = 48.dp)
             .padding(top = 140.dp)) {
