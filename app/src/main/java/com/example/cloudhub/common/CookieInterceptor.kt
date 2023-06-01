@@ -60,6 +60,6 @@ fun isCookieExist(context: Context): Boolean {
 fun delCookie(context: Context) {
     val sharedPreferences = context.getSharedPreferences("cookies", Context.MODE_PRIVATE)
     val editor: SharedPreferences.Editor = sharedPreferences.edit()
-    editor.remove("cookies")
+    editor.remove("cookie")
     editor.apply()
 }
