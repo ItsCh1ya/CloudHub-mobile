@@ -49,7 +49,7 @@ fun FilesListScreen(
 ) {
     val context = LocalContext.current
     val state = viewModel.filesResultState.value
-    val launcher = // TODO: move logic to viewmodel
+    val launcher = // TODO: move logic to viewmodel, main thread overload
         rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             val pickedImageUri1: Uri?
             val data = result.data
@@ -57,33 +57,7 @@ fun FilesListScreen(
             pickedImageUri1 = data?.data
 
             pickedImageUri1?.let { uri ->
-                val contentResolver = context.contentResolver
-                val inputStream = contentResolver.openInputStream(pickedImageUri1)
-
-                if (inputStream != null) {
-                    val fileName = getFileNameFromUri(contentResolver, pickedImageUri1)
-
-                    val file = File(context.cacheDir, fileName)
-                    file.createNewFile()
-
-                    // Copy the content from the input stream to the file
-                    file.outputStream().use { outputStream ->
-                        inputStream.copyTo(outputStream)
-                    }
-
-                    inputStream.close() // Close the input stream
-
-                    val requestFile =
-                        file.asRequestBody("multipart/form-data".toMediaTypeOrNull())
-                    val body = MultipartBody.Part.createFormData("file", file.name, requestFile)
-
-                    val response = viewModel.uploadFile(body)
-                    Log.d("pickerDocs", response.toString())
-                    // Handle the response
-                } else {
-                    // Handle the case when inputStream is null
-                }
-
+                viewModel.uploadFile(uri, context)
             }
         }
 
@@ -137,21 +111,4 @@ fun FilesListScreen(
             }
         }
     })
-}
-
-private fun getFileNameFromUri(contentResolver: ContentResolver, uri: Uri): String {
-    val cursor = contentResolver.query(uri, null, null, null, null)
-    cursor?.use {
-        if (it.moveToFirst()) {
-            val displayNameIndex = it.getColumnIndex(OpenableColumns.DISPLAY_NAME)
-            if (displayNameIndex != -1) {
-                val displayName = it.getString(displayNameIndex)
-                val extension = MimeTypeMap.getFileExtensionFromUrl(displayName)
-                if (!extension.isNullOrEmpty()) {
-                    return "${System.currentTimeMillis()}.$extension"
-                }
-            }
-        }
-    }
-    return ""
 }

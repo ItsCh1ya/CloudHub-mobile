@@ -1,7 +1,12 @@
 package com.example.cloudhub.presentation.main.files_list
 
+import android.content.ContentResolver
+import android.content.Context
+import android.net.Uri
 import android.os.Environment
+import android.provider.OpenableColumns
 import android.util.Log
+import android.webkit.MimeTypeMap
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -12,12 +17,15 @@ import com.example.cloudhub.domain.use_cases.DownloadFileUseCase
 import com.example.cloudhub.domain.use_cases.FetchFilesUseCase
 import com.example.cloudhub.domain.use_cases.UploadFileUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.ResponseBody
 import java.io.File
 import javax.inject.Inject
@@ -40,6 +48,31 @@ class FilesListViewModel @Inject constructor(
         fetchFiles()
     }
 
+    fun uploadFile(uri: Uri, context: Context) {
+        viewModelScope.launch {
+            val contentResolver = context.contentResolver
+            val inputStream = contentResolver.openInputStream(uri)
+
+            inputStream?.let {
+                val fileName = getFileNameFromUri(contentResolver, uri)
+                val file = File(context.cacheDir, fileName)
+                file.createNewFile()
+
+                file.outputStream().use { outputStream ->
+                    inputStream.copyTo(outputStream)
+                }
+
+                inputStream.close() // Close the input stream
+
+                val requestFile = file.asRequestBody("multipart/form-data".toMediaTypeOrNull())
+                val body = MultipartBody.Part.createFormData("file", file.name, requestFile)
+
+                val response = uploadFileUseCase(body) // Use use-case instead
+                Log.d("pickerDocs", response.toString())
+                // Handle the response
+            }
+        }
+    }
     private fun fetchFiles() {
         fetchFilesUseCase().onEach { result ->
             when (result) {
@@ -88,9 +121,21 @@ class FilesListViewModel @Inject constructor(
             return@withContext ""
         }
     }
-    fun uploadFile(file: MultipartBody.Part){
-        viewModelScope.launch {
-            uploadFileUseCase(file)
+
+    private fun getFileNameFromUri(contentResolver: ContentResolver, uri: Uri): String {
+        val cursor = contentResolver.query(uri, null, null, null, null)
+        cursor?.use {
+            if (it.moveToFirst()) {
+                val displayNameIndex = it.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+                if (displayNameIndex != -1) {
+                    val displayName = it.getString(displayNameIndex)
+                    val extension = MimeTypeMap.getFileExtensionFromUrl(displayName)
+                    if (!extension.isNullOrEmpty()) {
+                        return "${System.currentTimeMillis()}.$extension"
+                    }
+                }
+            }
         }
+        return ""
     }
 }
