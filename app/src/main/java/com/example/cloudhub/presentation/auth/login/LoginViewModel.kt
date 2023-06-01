@@ -22,7 +22,19 @@ class LoginViewModel @Inject constructor(
     private val _logState = mutableStateOf(LoginResult(false, ""))
     val logState: State<LoginResult> = _logState
     fun login(email: String, password: String, navController: NavController, context: Context) {
-        loginUseCase(email, password).onEach {
+        // Check if the email and password are valid
+        if (!isEmailValid(email)) {
+            showError(context, "Email doesn't looks like valid")
+            return
+        }
+
+        if (!isPasswordValid(password)) {
+            showError(context, "Min length of password - 4 symbols")
+            return
+        }
+
+        // Perform the loginUseCase
+        loginUseCase(email, password).onEach { it ->
             when (it) {
                 is Resource.Success -> {
                     _logState.value = LoginResult(true, "Account successfully registered")
@@ -33,7 +45,7 @@ class LoginViewModel @Inject constructor(
                     }
                 }
                 is Resource.Error -> {
-                    _logState.value = LoginResult(false, message = it.message)
+                    it.message?.let { it1 -> showError(context, it1) }
                     Toast.makeText(
                         context,
                         it.message,
@@ -41,9 +53,25 @@ class LoginViewModel @Inject constructor(
                     ).show()
                 }
                 is Resource.Loading -> {
-                    _logState.value = LoginResult(false, message = "Loading, please wait...")
+                    showError(context,  "Loading, please wait...")
                 }
             }
         }.launchIn(viewModelScope)
+    }
+
+    private fun isEmailValid(email: String): Boolean {
+        val emailRegex = Regex("^\\w+([.-]?\\w+)*@\\w+([.-]?\\w+)*(\\.\\w{2,3})+\$")
+        return email.matches(emailRegex)
+    }
+
+    private fun isPasswordValid(password: String): Boolean {
+        return password.isNotEmpty() && password.length >= 4
+    }
+    private fun showError(context: Context, message: String){
+        Toast.makeText(
+            context,
+            message,
+            Toast.LENGTH_SHORT
+        ).show()
     }
 }
