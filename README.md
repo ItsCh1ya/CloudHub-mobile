@@ -1,0 +1,3 @@
+# CloudHub-mobile
+Приложение облочного хранилища.\
+Clean architecture, mvvm, dagger, retrofit, compose, etc...
